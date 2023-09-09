@@ -1,5 +1,5 @@
 
-### Functi
+
 ############# This function takes in multiple rasters and calculates the mean 
 ## from them and creates a raster which contains the mean values of that raster
 ## this one creates a single list of rasters ###
