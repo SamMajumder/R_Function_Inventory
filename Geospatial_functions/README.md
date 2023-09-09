@@ -26,9 +26,11 @@ A list of dataframes with the extracted raster values.
 ### Example Usage:
 
 **Sample dataframe and raster list**
+
 df <- data.frame(ID = c(1, 2), LONGITUDE = c(34.5, 35.6), LATITUDE = c(-0.5, -1.6))
 
 **Extract raster data**
+
 result <- extract_raster_data_by_id(df, "/path/to/rasters", c("-1-", "-2-"), "ID")
 
 
@@ -56,10 +58,13 @@ A list of dataframes with the extracted raster values.
 ### Example Usage:
 
 **Sample dataframe and raster list**
+
 df <- data.frame(ID = c(1, 2), Longitude = c(34.5, 35.6), Latitude = c(-0.5, -1.6))
+
 rasters <- list(raster1, raster2) 
 
 **Extract raster data**
+
 result <- extract_raster_data_by_id_multi(df, rasters, "ID")
 
 ---
@@ -84,6 +89,7 @@ A raster containing the mean values of the input rasters.
 ### Example Usage:
 
 **Create mean raster**
+
 mean_rast <- create_mean_raster("/path/to/rasters", "search_pattern")
 
 ---
@@ -109,6 +115,7 @@ A list of rasters containing the mean values of the input rasters for each searc
 ### Example Usage:
 
 **Create list of mean rasters**
+
 mean_rasters <- create_mean_rasters_multi_group("/path/to/rasters", c("pattern1", "pattern2"))
 
 ---
@@ -137,9 +144,13 @@ An interactive plot with the raster and point data.
 ### Example usage:
 
 **Sample raster and sf object**
+
 mean_raster <- raster(matrix(runif(100), 10))
+
 df_sf <- st_as_sf(data.frame(ID = 1:10, Longitude = runif(10, 34, 36), Latitude = runif(10, -1, 1)), coords = c("Longitude", "Latitude"))
+
 **Plot interactive map**
+
 plot <- plot_raster_with_sf_points_interactive(mean_raster, df_sf, c("ID")) 
 
 
@@ -172,10 +183,13 @@ A list of interactive plots with the raster and point data.
 ### Example Usage:
 
 **Sample raster list and sf object**
+
 rasters <- list(raster1, raster2)
+
 df_sf <- st_as_sf(data.frame(ID = c(1, 2), Longitude = c(34.5, 35.6), Latitude = c(-0.5, -1.6)), coords = c("Longitude", "Latitude"))
 
 **Plot interactive maps**
+
 plots <- plot_rasters_with_sf_points_interactive_multi(rasters, df_sf, "ID", c("ID"), c("Title1", "Title2"))
 
 
