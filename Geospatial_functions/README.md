@@ -23,6 +23,8 @@ A list of dataframes with the extracted raster values.
 - The function uses the `st_extract` function from the `sf` package to extract raster values. Ensure that the `sf` package is installed and loaded.
 - The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files.
 
+
+
 ---
 
 ## `extract_raster_data_by_id_multi`
@@ -43,6 +45,15 @@ A list of dataframes with the extracted raster values.
 
 ### Notes:
 - The function uses the `extract` function from the `raster` package to extract raster values. Ensure that the `raster` package is installed and loaded.
+
+### Example Usage:
+```R   
+# Sample dataframe and raster list
+df <- data.frame(ID = c(1, 2), Longitude = c(34.5, 35.6), Latitude = c(-0.5, -1.6))
+rasters <- list(raster1, raster2)
+# Extract raster data
+result <- extract_raster_data_by_id_multi(df, rasters, "ID")
+
 
 ---
 
