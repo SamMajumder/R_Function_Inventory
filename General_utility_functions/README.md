@@ -13,6 +13,7 @@ A list containing:
 - **Missing_data_percent**: A dataframe showing the percentage of missing values for each variable.
 - **Missing_Valu_plot**: A ggplot object visualizing the percentage of missing values for each variable.
 
-***Example Usage:**
+**Example Usage:**
+
 data_insights <- Missing_data_insights(my_dataframe, columns_to_remove = c("column1", "column2"))
 
