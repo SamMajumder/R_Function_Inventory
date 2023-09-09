@@ -17,3 +17,7 @@ A list containing:
 
 data_insights <- Missing_data_insights(my_dataframe, columns_to_remove = c("column1", "column2"))
 
+## Notes:
+- The function uses the gather function from the tidyverse package to reshape the dataframe for analysis. Ensure that the tidyverse package is installed and loaded.
+- The function returns a ggplot object for the missing value plot. To view the plot, you can simply print the Missing_Valu_plot element from the returned list.
+- If you provide column names in the columns_to_remove parameter, those columns will be excluded from the analysis.
