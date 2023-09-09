@@ -32,9 +32,9 @@ result <- extract_raster_data_by_id(df = your_dataframe,
 - The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files.
 - The `bilinear` argument determines the method of extraction. If `TRUE`, bilinear interpolation is used; otherwise, the nearest neighbor method is used.
 
----
 
-## `extract_raster_data_by_id_multi`
+
+### `extract_raster_data_by_id`
 
 ### Description
 This function extracts values from a list of raster datasets at specific points provided in a dataframe. The function returns a list of dataframes with the extracted raster values added as a new column.
