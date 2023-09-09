@@ -23,7 +23,7 @@ A list of dataframes with the extracted raster values.
 - The function uses the `st_extract` function from the `sf` package to extract raster values. Ensure that the `sf` package is installed and loaded.
 - The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files.
 
-Example Usage:
+**Example Usage:**
 
 
 
