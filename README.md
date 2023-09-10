@@ -1,4 +1,4 @@
-# 📚 R_Function_Inventory
+# 📦 inventoRy
 
 Welcome to the [inventoRy](https://github.com/SamMajumder/inventoRy) repository! This is a curated collection of R functions written by me and are designed to assist data enthusiasts, researchers, as well as developers in their R programming journey.
 
