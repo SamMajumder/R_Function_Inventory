@@ -563,7 +563,7 @@ Returns a raster stack where each layer contains the yearly average values for e
 - If the total number of layers in the raster brick is not a multiple of 12, the function will still compute the average for the remaining months in the last year.
 
 #### Example usage:
-\```R
+\```{R}
 # Assuming temp_data_subset is your raster brick with monthly data
 
 yearly_avg_result <- calculate_yearly_avg_raster(temp_data_subset)
