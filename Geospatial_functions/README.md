@@ -25,8 +25,7 @@ A list of dataframes with the extracted raster values.
 
 ### Example Usage:
 
-\```R
-
+```R
 ##Sample dataframe and raster list
 
 df <- data.frame(ID = c(1, 2), LONGITUDE = c(34.5, 35.6), LATITUDE = c(-0.5, -1.6))
@@ -34,7 +33,7 @@ df <- data.frame(ID = c(1, 2), LONGITUDE = c(34.5, 35.6), LATITUDE = c(-0.5, -1.
 ##Extract raster data
 
 result <- extract_raster_data_by_id(df, "/path/to/rasters", c("-1-", "-2-"), "ID")
-\```
+```
 
 ---
 
@@ -59,7 +58,7 @@ A list of dataframes with the extracted raster values.
 
 ### Example Usage:
 
-\```R
+```R
 
 ##Sample dataframe and raster list
 
@@ -71,7 +70,7 @@ rasters <- list(raster1, raster2)
 
 result <- extract_raster_data_by_id_multi(df, rasters, "ID")
 
-\```
+```
 
 ---
 
@@ -94,12 +93,13 @@ A raster containing the mean values of the input rasters.
 
 ### Example Usage:
 
-\```R
+```R
+
 ##Create mean raster
 
 mean_rast <- create_mean_raster("/path/to/rasters", "search_pattern")
 
-\```
+```
 
 ---
 
@@ -123,13 +123,13 @@ A list of rasters containing the mean values of the input rasters for each searc
 
 ### Example Usage:
 
-\```R
+```R
 
 ##Create list of mean rasters
 
 mean_rasters <- create_mean_rasters_multi_group("/path/to/rasters", c("pattern1", "pattern2"))
 
-\```
+```
 
 ---
 
@@ -156,7 +156,7 @@ An interactive plot with the raster and point data.
 
 ### Example usage:
 
-\```R
+```R
 
 ##Sample raster and sf object
 
@@ -168,7 +168,7 @@ df_sf <- st_as_sf(data.frame(ID = 1:10, Longitude = runif(10, 34, 36), Latitude 
 
 plot <- plot_raster_with_sf_points_interactive(mean_raster, df_sf, c("ID"))
 
-\```
+```
 
 ---
 ## `plot_rasters_with_sf_points_interactive_multi`
@@ -198,7 +198,7 @@ A list of interactive plots with the raster and point data.
 
 ### Example Usage:
 
-\```R
+```R
 ##Sample raster list and sf object**
 
 rasters <- list(raster1, raster2)
@@ -209,7 +209,7 @@ df_sf <- st_as_sf(data.frame(ID = c(1, 2), Longitude = c(34.5, 35.6), Latitude =
 
 plots <- plot_rasters_with_sf_points_interactive_multi(rasters, df_sf, "ID", c("ID"), c("Title1", "Title2"))
 
-\```
+```
 
 ---
 
@@ -236,7 +236,7 @@ A list of dataframes with the extracted raster values.
 
 ### Example Usage:
 
-\```R
+```R
 
 ##Sample dataframe with coordinates and ID
 
@@ -264,7 +264,7 @@ result <- extract_raster_data_by_id(df, directory_path, search_strings, split_id
 ## Print the result
 print(result)
 
-\```
+```
 
 ---
 
@@ -289,7 +289,7 @@ A list of dataframes with the extracted raster values.
 
 ### Example Usage:
 
-\```R
+```R
 
 ##Sample dataframe and raster list
 
@@ -301,7 +301,7 @@ rasters <- list(raster1, raster2)
 
 result <- extract_raster_data_by_id_multi(df, rasters, "ID")
 
-\```
+```
 
 ---
 
@@ -324,7 +324,7 @@ A raster containing the mean values of the input rasters.
 
 ### Example Usage:
 
-\```R
+```R
 ##Directory path where raster files are stored
 
 directory_path <- "/path/to/raster/files"
@@ -345,7 +345,7 @@ print(mean_raster_result)
 
 writeRaster(mean_raster_result, filename = "/path/to/save/mean_raster.tif", format = "GTiff")
 
-\```
+```
 
 ---
 
@@ -368,7 +368,7 @@ A list of rasters containing the mean values of the input rasters for each searc
 
 ### Example usage
 
-\```R
+```R
 
 ## Directory path where raster files are stored
 
@@ -392,7 +392,7 @@ lapply(names(mean_rasters_results), function(name) {
   writeRaster(mean_rasters_results[[name]], filename = paste0("/path/to/save/", name, "_mean.tif"), format = "GTiff")
 })
 
-\```
+```
 
 ---
 
@@ -418,7 +418,7 @@ An interactive plot with the raster and point data.
 
 ### Example usage:
 
-\```R
+```R
 
 ## Create a sample raster
 
@@ -447,8 +447,7 @@ interactive_map <- plot_raster_with_sf_points_interactive(r, df_sf, hover_column
 
 interactive_map
 
-
-\```
+```
 
 ---
 ## `plot_rasters_with_sf_points_interactive_multi`
@@ -478,7 +477,7 @@ A list of interactive plots with the raster and point data.
 
 ### Example usage:
 
-\```R
+```R
 
 ##Create sample rasters
 
@@ -516,7 +515,8 @@ interactive_maps <- plot_rasters_with_sf_points_interactive_multi(list(r1, r2), 
 
 lapply(interactive_maps, print)
 
-\```
+```
+
 ---  
 
 ## `calculate_yearly_avg`
@@ -537,13 +537,13 @@ A list containing the yearly average for each year based on the layers in the pr
 
 ### Example Usage:
 
-\```R
+```R
 
 ## Assuming `temp_data_subset` is your raster brick with monthly data layers
 
 yearly_averages <- calculate_yearly_avg(temp_data_subset)
 
-\```
+```
 ---
 
 ### `calculate_yearly_avg_raster` Function
