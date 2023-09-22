@@ -5,7 +5,7 @@
 ## `extract_raster_data_by_id`
 
 ### Description:
-This function extracts raster data values at specified coordinates from raster files in a given directory. The function returns a list of data frames with the extracted raster values.
+This function extracts raster data values at specified coordinates from raster files in a given directory. The function returns a list of data frames with the extracted raster values. Each data frame in the list also contains a column "matched_string" indicating which raster file string pattern was matched and used for data extraction.
 
 ### Parameters:
 - `df`: A dataframe containing coordinates and an ID column.
@@ -17,11 +17,13 @@ This function extracts raster data values at specified coordinates from raster f
 - `bilinear`: Logical. If `TRUE`, uses bilinear interpolation for extraction. Default is `TRUE`.
 
 ### Returns:
-A list of dataframes with the extracted raster values.
+A list of dataframes with the extracted raster values. Each dataframe will also have a "matched_string" column indicating the matched raster file string pattern.
 
 ### Notes:
 - The function uses the `st_extract` function from the `sf` package to extract raster values. Ensure that the `sf` package is installed and loaded.
-- The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files.
+- The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files. 
+- The function now includes error handling. If there's an issue reading a raster file or if the directory path is incorrect, the function will display a warning and continue processing. 
+- A progress bar is displayed in the console, indicating which ID is currently being processed.
 
 ### Example Usage:
 
@@ -34,6 +36,30 @@ df <- data.frame(ID = c(1, 2), LONGITUDE = c(34.5, 35.6), LATITUDE = c(-0.5, -1.
 
 result <- extract_raster_data_by_id(df, "/path/to/rasters", c("-1-", "-2-"), "ID")
 ```
+
+### Use Case & Example:
+
+Imagine you have a dataframe like this: 
+
+```R
+df <- data.frame(YEAR = c(2001, 2001, 2002, 2002, 2003),
+                 LONGITUDE = c(34.5, 35.6, 34.5, 35.6, 34.5),
+                 LATITUDE = c(-0.5, -1.6, -0.5, -1.6, -0.5))
+
+```
+This dataframe contains data spanning multiple years (2001, 2002, and 2003). Each entry has a latitude and longitude, but not all locations are present in every year. In a directory, you have raster files, each containing data for a specific month and year (e.g., temperature or precipitation data for January 2001, February 2001, etc.).
+
+Using `extract_raster_data_by_id`, you can:
+
+- **Process the Data:** For each unique year in your dataframe, the function identifies all associated raster files.
+- **Extract Values:** Data values are extracted from each raster file based on the specific latitude and longitude coordinates in your dataframe for that year.
+- **Add Extracted Values:** These extracted values are added as new columns to the dataframe, one for each month/raster file.
+- **Organize Results:** Obtain a list of dataframes, where each dataframe corresponds to a unique year and contains the extracted raster values for each month of that year.
+
+This approach is especially useful for researchers and analysts working with spatial-temporal data, allowing for efficient extraction and organization of raster data based on spatial coordinates and temporal identifiers.
+
+
+
 
 ---
 
