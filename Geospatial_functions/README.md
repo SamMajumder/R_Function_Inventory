@@ -88,7 +88,7 @@ The `raster_pipeline_point` function processes raster files, optionally resample
 - During resampling, the user-defined `crs` is used as the target CRS.
 - A progress bar is displayed to show the progress of processing each raster in the `inputs` list.
 
-### Example Usage:
+### Example of Simple Usage:
 
 **Basic Usage**:
 ```R
@@ -114,28 +114,37 @@ result <- raster_pipeline_point(inputs = list("path/to/raster1.tif"), resample_f
 
 ### Use Case & Example:
 #### Spatial Analysis for Environmental Research:
-
-Imagine you're an environmental researcher with a collection of raster files representing monthly precipitation data over several years. You also have a dataframe of specific locations (e.g., weather stations) with latitude and longitude coordinates. You're interested in extracting the monthly precipitation values for these locations to analyze trends over time.
+Imagine you're an environmental researcher with a collection of raster files representing monthly precipitation data over several years. Each raster file is named based on the month and year it represents, like `Jan_2001.tif`, `Feb_2001.tif`, and so on. You also have a dataframe of specific locations (e.g., weather stations) with latitude, longitude coordinates, and years of data collection. You're interested in extracting the monthly precipitation values for these locations to analyze trends over time.
 
 Using `raster_pipeline_point`, you can:
 
 - **Process the Data**: Provide the paths to your raster files and the dataframe of locations.
+- **Match Data by Year**: The `split_id` and `search_strings` parameters allow the function to match the years in the dataframe with the appropriate raster files, ensuring that data extraction is specific to each year.
 - **Extract Values**: The function will extract the monthly precipitation values for each location.
 - **Resample Rasters**: If your rasters are at a very high resolution and you want to reduce the computational load, you can resample them.
 - **Crop to Area of Interest**: If you have a shapefile representing your study area, you can provide its path to crop the rasters to this area, reducing unnecessary data.
 
+
+```R
+
 # Sample dataframe of locations
-df <- data.frame(StationID = c(1, 2), LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6))
+df <- data.frame(StationID = c(1, 2), LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6), Year = c(2001, 2002))
 
 # Extract precipitation data for these locations from a list of raster files
 result <- raster_pipeline_point(
-    inputs = list("path/to/precip_jan.tif", "path/to/precip_feb.tif"),
+    inputs = list("path/to/precip_Jan_2001.tif", "path/to/precip_Feb_2001.tif", "path/to/precip_Jan_2002.tif"),
     df = df,
     lat_col = "LATITUDE",
-    lon_col = "LONGITUDE"
+    lon_col = "LONGITUDE",
+    split_id = "Year",
+    search_strings = c("-2001-", "-2002-"),
+    reference_shape_path = "path/to/study_area_shapefile.shp",
+    resample_factor = 0.5
 )
 
-This approach allows researchers to efficiently process and analyze spatial-temporal data, making it easier to derive insights from large datasets.
+```
+
+In this example, the function returns a list of dataframes, where each dataframe corresponds to a unique year and contains the extracted raster values for each month of that year. The raster files are also resampled and cropped to the area of interest, ensuring efficient and relevant data extraction.
 
 
 ---

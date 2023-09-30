@@ -1,14 +1,5 @@
 
 
-library(raster)
-library(stars)
-library(sf)
-library(here)
-library(tidyverse)
-
-rm(list = ls())
-
-
 raster_pipeline_point <- function(inputs, 
                                   df = NULL, 
                                   lat_col = NULL, 
@@ -122,6 +113,14 @@ raster_pipeline_point <- function(inputs,
   
   return(list(processed_rasters = processed_rasters, dataframes_with_values = dataframes_with_values))
 }
+
+
+
+
+
+
+
+
 
 
 
