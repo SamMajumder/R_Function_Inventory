@@ -21,8 +21,8 @@ A list of dataframes with the extracted raster values. Each dataframe will also 
 
 ### Notes:
 - The function uses the `st_extract` function from the `sf` package to extract raster values. Ensure that the `sf` package is installed and loaded.
-- The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files. 
-- The function now includes error handling. If there's an issue reading a raster file or if the directory path is incorrect, the function will display a warning and continue processing. 
+- The `search_strings` parameter is used to identify specific raster files in the directory. Ensure that the search strings match the naming convention of your raster files.
+- The function now includes error handling. If there's an issue reading a raster file or if the directory path is incorrect, the function will display a warning and continue processing.
 - A progress bar is displayed in the console, indicating which ID is currently being processed.
 
 ### Example Usage:
@@ -39,7 +39,7 @@ result <- extract_raster_data_by_id(df, "/path/to/rasters", c("-1-", "-2-"), "ID
 
 ### Use Case & Example:
 
-Imagine you have a dataframe like this: 
+Imagine you have a dataframe like this:
 
 ```R
 df <- data.frame(YEAR = c(2001, 2001, 2002, 2002, 2003),
@@ -58,45 +58,85 @@ Using `extract_raster_data_by_id`, you can:
 
 This approach is especially useful for researchers and analysts working with spatial-temporal data, allowing for efficient extraction and organization of raster data based on spatial coordinates and temporal identifiers.
 
-
-
-
 ---
 
-## `extract_raster_data_by_id_multi`
+## `raster_pipeline_point`
 
 ### Description:
-This function extracts raster data values at specified coordinates from a list of provided rasters. The function returns a list of data frames with the extracted raster values.
+The `raster_pipeline_point` function processes raster files, optionally resamples them, optionally crops them to a reference shapefile, and optionally extracts values for points provided in a dataframe. The function is designed to handle various scenarios based on the combination of mandatory and optional arguments provided.
 
 ### Parameters:
-- `df`: A dataframe containing coordinates and an ID column.
-- `raster_list`: A list of raster objects.
-- `split_id`: Name of the column in `df` used to split the dataframe.
-- `coord_names`: Names of the columns in `df` containing the coordinates. Default is `c("Longitude", "Latitude")`.
-- `new_column_name`: Name of the new column in the dataframe to store the extracted raster values. Default is "raster_values".
-- `bilinear`: Logical. If `TRUE`, uses bilinear interpolation for extraction. Default is `TRUE`.
+- **`inputs`**: A list of paths to raster files that the user wants to process.
+- **`df`**: (Optional) A dataframe containing coordinates for which raster values need to be extracted.
+- **`lat_col`**, **`lon_col`**: (Optional) Names of the columns in `df` containing the latitude and longitude coordinates, respectively.
+- **`split_id`**: (Optional) Name of the column in `df` used to split the dataframe.
+- **`search_strings`**: (Optional) A vector of strings to identify specific raster files.
+- **`resample_factor`**: (Optional) Factor by which the raster should be resampled.
+- **`crs`**: Coordinate Reference System to be assigned to rasters with undefined CRS. Default is EPSG:4326 (WGS 84).
+- **`method`**: (Optional) Method used for resampling. Default is "bilinear".
+- **`no_data_value`**: (Optional) Value assigned to cells with no data. Default is -9999.
+- **`reference_shape_path`**: (Optional) Path to a reference shapefile used to crop the rasters.
 
 ### Returns:
-A list of dataframes with the extracted raster values.
+- **`processed_rasters`**: A list of processed raster layers.
+- **`dataframes_with_values`**: A list of dataframes with extracted raster values (if `df`, `lat_col`, and `lon_col` are provided).
 
 ### Notes:
-- The function uses the `extract` function from the `raster` package to extract raster values. Ensure that the `raster` package is installed and loaded.
+- The function uses functions from the `sf` and `stars` packages for spatial operations. Ensure that these packages are installed and loaded.
+- If a raster has an undefined CRS, the function assigns it the user-defined `crs`.
+- If a `reference_shape` is provided and its CRS is different from the raster's CRS, the raster is transformed to the CRS of the reference shapefile.
+- During resampling, the user-defined `crs` is used as the target CRS.
+- A progress bar is displayed to show the progress of processing each raster in the `inputs` list.
 
 ### Example Usage:
 
+**Basic Usage**:
 ```R
-
-##Sample dataframe and raster list
-
-df <- data.frame(ID = c(1, 2), Longitude = c(34.5, 35.6), Latitude = c(-0.5, -1.6))
-
-rasters <- list(raster1, raster2)
-
-##Extract raster data
-
-result <- extract_raster_data_by_id_multi(df, rasters, "ID")
+# Process a list of raster files
+result <- raster_pipeline_point(inputs = list("path/to/raster1.tif", "path/to/raster2.tif"))
 
 ```
+
+**With Data Extraction**:
+```R
+## extract raster data at coordinates and add it to the dataframe
+
+df <- data.frame(LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6))
+result <- raster_pipeline_point(inputs = list("path/to/raster1.tif"), df = df, lat_col = "LATITUDE", lon_col = "LONGITUDE")
+
+```
+
+**With Resampling**:
+```R
+result <- raster_pipeline_point(inputs = list("path/to/raster1.tif"), resample_factor = 0.5)
+
+```
+
+### Use Case & Example:
+#### Spatial Analysis for Environmental Research:
+
+Imagine you're an environmental researcher with a collection of raster files representing monthly precipitation data over several years. You also have a dataframe of specific locations (e.g., weather stations) with latitude and longitude coordinates. You're interested in extracting the monthly precipitation values for these locations to analyze trends over time.
+
+Using `raster_pipeline_point`, you can:
+
+- **Process the Data**: Provide the paths to your raster files and the dataframe of locations.
+- **Extract Values**: The function will extract the monthly precipitation values for each location.
+- **Resample Rasters**: If your rasters are at a very high resolution and you want to reduce the computational load, you can resample them.
+- **Crop to Area of Interest**: If you have a shapefile representing your study area, you can provide its path to crop the rasters to this area, reducing unnecessary data.
+
+# Sample dataframe of locations
+df <- data.frame(StationID = c(1, 2), LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6))
+
+# Extract precipitation data for these locations from a list of raster files
+result <- raster_pipeline_point(
+    inputs = list("path/to/precip_jan.tif", "path/to/precip_feb.tif"),
+    df = df,
+    lat_col = "LATITUDE",
+    lon_col = "LONGITUDE"
+)
+
+This approach allows researchers to efficiently process and analyze spatial-temporal data, making it easier to derive insights from large datasets.
+
 
 ---
 
@@ -265,7 +305,7 @@ yearly_averages <- calculate_yearly_avg(temp_data_subset)
 ```
 ---
 
-### `calculate_yearly_avg_raster` 
+### `calculate_yearly_avg_raster`
 
 #### Description:
 This function calculates the yearly average for each cell in a raster brick. The raster brick is assumed to contain monthly data, with 12 layers representing each month of a year. The function returns a raster stack where each layer represents the yearly average for each cell.
