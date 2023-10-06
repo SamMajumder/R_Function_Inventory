@@ -60,10 +60,11 @@ This approach is especially useful for researchers and analysts working with spa
 
 ---
 
+
 ## `raster_pipeline_point`
 
 ### Description:
-The `raster_pipeline_point` function processes raster files, optionally resamples them, optionally crops them to a reference shapefile, and optionally extracts values for points provided in a dataframe. The function is designed to handle various scenarios based on the combination of mandatory and optional arguments provided.
+The `raster_pipeline_point` function processes raster files, optionally resamples them, optionally crops them to a reference shapefile, and optionally extracts values for points provided in a dataframe. With the added `use_bilinear` argument, users can now opt to use bilinear interpolation when extracting values from the raster. The function is designed to handle various scenarios based on the combination of mandatory and optional arguments provided.
 
 ### Parameters:
 - **`inputs`**: A list of paths to raster files that the user wants to process.
@@ -76,6 +77,7 @@ The `raster_pipeline_point` function processes raster files, optionally resample
 - **`method`**: (Optional) Method used for resampling. Default is "bilinear".
 - **`no_data_value`**: (Optional) Value assigned to cells with no data. Default is -9999.
 - **`reference_shape_path`**: (Optional) Path to a reference shapefile used to crop the rasters.
+- **`use_bilinear`**: (Optional) Boolean flag to use bilinear interpolation when extracting values. Default is TRUE.
 
 ### Returns:
 - **`processed_rasters`**: A list of processed raster layers.
@@ -94,7 +96,6 @@ The `raster_pipeline_point` function processes raster files, optionally resample
 ```R
 # Process a list of raster files
 result <- raster_pipeline_point(inputs = list("path/to/raster1.tif", "path/to/raster2.tif"))
-
 ```
 
 **With Data Extraction**:
@@ -103,13 +104,11 @@ result <- raster_pipeline_point(inputs = list("path/to/raster1.tif", "path/to/ra
 
 df <- data.frame(LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6))
 result <- raster_pipeline_point(inputs = list("path/to/raster1.tif"), df = df, lat_col = "LATITUDE", lon_col = "LONGITUDE")
-
 ```
 
 **With Resampling**:
 ```R
 result <- raster_pipeline_point(inputs = list("path/to/raster1.tif"), resample_factor = 0.5)
-
 ```
 
 ### Use Case & Example:
@@ -124,9 +123,7 @@ Using `raster_pipeline_point`, you can:
 - **Resample Rasters**: If your rasters are at a very high resolution and you want to reduce the computational load, you can resample them.
 - **Crop to Area of Interest**: If you have a shapefile representing your study area, you can provide its path to crop the rasters to this area, reducing unnecessary data.
 
-
 ```R
-
 # Sample dataframe of locations
 df <- data.frame(StationID = c(1, 2), LATITUDE = c(-0.5, -1.6), LONGITUDE = c(34.5, 35.6), Year = c(2001, 2002))
 
@@ -141,13 +138,84 @@ result <- raster_pipeline_point(
     reference_shape_path = "path/to/study_area_shapefile.shp",
     resample_factor = 0.5
 )
-
 ```
 
 In this example, the function returns a list of dataframes, where each dataframe corresponds to a unique year and contains the extracted raster values for each month of that year. The raster files are also resampled and cropped to the area of interest, ensuring efficient and relevant data extraction.
 
+---
+
+
+# `raster_pipeline_polygon`
+
+## Description
+The `raster_pipeline_polygon` function processes raster files, optionally resamples them, and optionally extracts values for polygons provided in a dataframe. The function is tailored to handle various workflows based on the combination of mandatory and optional arguments provided.
+
+## Parameters
+- **`inputs`**: A list of paths to raster files that the user wants to process.
+- **`df`**: (Optional) A dataframe containing polygons for which raster values need to be extracted.
+- **`polygon_col`**: (Optional) Name of the column in `df` containing the polygons.
+- **`split_id`**: (Optional) Name of the column in `df` used to split the dataframe.
+- **`search_strings`**: (Optional) A vector of strings to identify specific raster files.
+- **`resample_factor`**: (Optional) Factor by which the raster should be resampled.
+- **`crs`**: Coordinate Reference System to be assigned to rasters. Default is EPSG:4326 (WGS 84).
+- **`method`**: (Optional) Method used for resampling. Default is "bilinear".
+- **`no_data_value`**: (Optional) Value assigned to cells with no data. Default is -9999.
+- **`use_bilinear`**: (Optional) Boolean to decide if bilinear method should be used during extraction. Default is TRUE.
+
+## Returns
+- **`processed_rasters`**: A list of processed raster layers.
+- **`dataframes_with_values`**: A list of dataframes with extracted raster values (if `df` and `polygon_col` are provided).
+
+## Notes
+- The function uses functions from the `sf` and `stars` packages for spatial operations. Ensure that these packages are installed and loaded.
+- If a raster has an undefined CRS, the function assigns it the user-defined `crs`.
+- A progress bar is displayed to show the progress of processing each raster in the `inputs` list.
+
+## Example of Simple Usage
+**Basic Usage**:
+```R
+# Process a list of raster files
+result <- raster_pipeline_polygon(inputs = list("path/to/raster1.tif", "path/to/raster2.tif"))
+```
+
+**With Data Extraction**:
+```R
+# Sample dataframe of locations with polygons
+df <- data.frame(PolygonName = c("Area1", "Area2"), Polygon = c("POLYGON(...)", "POLYGON(...)"))
+# Extract raster data for these polygons
+result <- raster_pipeline_polygon(inputs = list("path/to/raster1.tif"), df = df, polygon_col = "Polygon")
+```
+
+**With Resampling**:
+```R
+result <- raster_pipeline_polygon(inputs = list("path/to/raster1.tif"), resample_factor = 0.5)
+```
+
+## Use Case & Example
+### Spatial Analysis for Environmental Research
+Imagine you're an environmental researcher with a collection of raster files representing yearly vegetation data. Each raster file is named based on the year it represents, like `Vegetation_2001.tif`, `Vegetation_2002.tif`, and so on. You also have a dataframe of specific regions (e.g., national parks) with their polygon geometries and years of interest. You're interested in extracting the yearly vegetation values for these regions.
+
+Using `raster_pipeline_polygon`, you can:
+- **Process the Data**: Provide the paths to your raster files and the dataframe of regions.
+- **Match Data by Year**: The `split_id` and `search_strings` parameters can be utilized to match the years in the dataframe with the appropriate raster files.
+- **Extract Values**: The function will extract the yearly vegetation values for each region.
+
+```R
+# Sample dataframe of regions with polygons
+df <- data.frame(RegionName = c("ParkA", "ParkB"), Polygon = c("POLYGON(...)", "POLYGON(...)"), Year = c(2001, 2002))
+# Extract vegetation data for these regions from a list of raster files
+result <- raster_pipeline_polygon(
+    inputs = list("path/to/Vegetation_2001.tif", "path/to/Vegetation_2002.tif"),
+    df = df,
+    polygon_col = "Polygon",
+    split_id = "Year",
+    search_strings = c("-2001-", "-2002-")
+)
+```
+In this example, the function returns a list of dataframes, where each dataframe corresponds to a unique year and contains the extracted raster values for that year.
 
 ---
+
 
 ## `create_mean_raster`
 
@@ -176,7 +244,6 @@ mean_rast <- create_mean_raster("/path/to/rasters", "search_pattern")
 
 ```
 
----
 
 ## `create_mean_rasters_multi_group`
 
@@ -204,9 +271,9 @@ A list of rasters containing the mean values of the input rasters for each searc
 
 mean_rasters <- create_mean_rasters_multi_group("/path/to/rasters", c("pattern1", "pattern2"))
 
-```
-
 ---
+
+```
 
 ## `plot_raster_with_sf_points_interactive`
 

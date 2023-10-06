@@ -1,23 +1,20 @@
 
-
-raster_pipeline_point <- function(inputs, 
-                                  df = NULL, 
-                                  lat_col = NULL, 
-                                  lon_col = NULL, 
-                                  split_id = NULL, 
-                                  search_strings = NULL, 
-                                  resample_factor = NULL,
-                                  crs = st_crs(4326),
-                                  method = "bilinear",
-                                  no_data_value = -9999,
-                                  reference_shape = NULL,
-                                  use_bilinear = TRUE) {
+raster_pipeline_polygon <- function(inputs,
+                                    df = NULL,
+                                    polygon_col = NULL,
+                                    split_id = NULL,
+                                    search_strings = NULL,
+                                    resample_factor = NULL,
+                                    crs = st_crs(4326),
+                                    method = "bilinear",
+                                    no_data_value = -9999,
+                                    use_bilinear = TRUE) {
   
   # Initialize the progress bar
   pb <- txtProgressBar(min = 0, max = length(inputs), style = 3)
   
+  # Define the process_raster function
   process_raster <- function(input) {
-    # Update progress bar
     setTxtProgressBar(pb, which(inputs == input))
     
     if (!file.exists(input)) {
@@ -33,18 +30,6 @@ raster_pipeline_point <- function(inputs,
     }, error = function(e) {
       stop(paste("Error reading the raster file:", input, "\nMessage:", e$message))
     })
-    
-    if (!is.null(reference_shape)) {
-      if (is.character(reference_shape)) {
-        reference_shape <- st_read(reference_shape, quiet = TRUE)
-      }
-      
-      if (!st_crs(reference_shape) == st_crs(raster_layer)) {
-        reference_shape <- st_transform(reference_shape, crs = st_crs(raster_layer))
-      }
-      
-      raster_layer <- st_crop(raster_layer, reference_shape)
-    }
     
     if (!is.null(resample_factor)) {
       new_dims <- map_dbl(dim(raster_layer), ~round(.x * resample_factor))
@@ -66,15 +51,14 @@ raster_pipeline_point <- function(inputs,
   
   dataframes_with_values <- list()
   
-  if (!is.null(df) && !is.null(lat_col) && !is.null(lon_col)) {
+  if (!is.null(df) && !is.null(polygon_col)) {
     if (is.null(split_id) || is.null(search_strings)) {
       df_list <- list(df)
       for (file in inputs) {
         cat("Processing file:", file, "\n")
         tryCatch({
           raster_data <- read_stars(file)
-          df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = st_crs(raster_data))
-          extracted_values <- st_extract(raster_data, df_sf, bilinear = use_bilinear)
+          extracted_values <- st_extract(raster_data, df[[polygon_col]], bilinear = use_bilinear)
           column_name <- paste0(basename(file), "_processed")
           df[[column_name]] <- extracted_values[[1]]
         }, error = function(e) {
@@ -107,8 +91,7 @@ raster_pipeline_point <- function(inputs,
             cat("Processing file:", file, "\n")
             tryCatch({
               raster_data <- read_stars(file)
-              df_sf <- st_as_sf(current_df, coords = c(lon_col, lat_col), crs = st_crs(raster_data))
-              extracted_values <- st_extract(raster_data, df_sf, bilinear = use_bilinear)
+              extracted_values <- st_extract(raster_data, current_df[[polygon_col]], bilinear = use_bilinear)
               column_name <- paste0(basename(file), "_processed")
               current_df[[column_name]] <- extracted_values[[1]]
             }, error = function(e) {
@@ -123,5 +106,4 @@ raster_pipeline_point <- function(inputs,
   
   return(list(processed_rasters = processed_rasters, dataframes_with_values = dataframes_with_values))
 }
-
 
