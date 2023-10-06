@@ -243,7 +243,7 @@ A raster containing the mean values of the input rasters.
 mean_rast <- create_mean_raster("/path/to/rasters", "search_pattern")
 
 ```
-
+---
 
 ## `create_mean_rasters_multi_group`
 
@@ -271,8 +271,9 @@ A list of rasters containing the mean values of the input rasters for each searc
 
 mean_rasters <- create_mean_rasters_multi_group("/path/to/rasters", c("pattern1", "pattern2"))
 
-
 ```
+
+---
 
 ## `plot_raster_with_sf_points_interactive`
 
