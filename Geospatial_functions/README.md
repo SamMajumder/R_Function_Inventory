@@ -271,7 +271,6 @@ A list of rasters containing the mean values of the input rasters for each searc
 
 mean_rasters <- create_mean_rasters_multi_group("/path/to/rasters", c("pattern1", "pattern2"))
 
----
 
 ```
 
