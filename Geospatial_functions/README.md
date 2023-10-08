@@ -1,5 +1,115 @@
 # R Functions Documentation
 
+## `geoRflow_load`
+
+### Description:
+The `geoRflow_load` function reads and loads geospatial data from the specified file path. It first checks if the file exists, and then identifies the file type based on its extension. Based on the file type, it loads and returns raster, vector, or NetCDF data using appropriate R functions from the `stars`, `sf`, and `raster` packages.
+
+### Parameters:
+- **`file_path`**: A string specifying the path to the geospatial data file to be loaded.
+
+### Returns:
+- Depending on the file type, one of the following:
+  - **`raster_data`**: An object of class `stars` representing raster data if the file extension is among ("tif", "tiff", "img", "jpg").
+  - **`vector_data`**: An object of class `sf` representing vector data if the file extension is among ("shp", "geojson", "gpkg").
+  - **`nc_data`**: An object of class `RasterBrick` representing NetCDF data if the file extension is among ("nc", "netcdf").
+
+### Errors:
+- Throws an error if the file is not found or if the file type is unsupported.
+
+### Notes:
+- The function utilizes the `stars`, `sf`, and `raster` packages for reading and loading geospatial data. Ensure that these packages are installed and loaded.
+- The `tools` package is used for extracting the file extension from the `file_path`.
+
+### Example of Simple Usage:
+
+**Basic Usage**:
+```R
+# Load a GeoTIFF raster file
+raster_data <- geoRflow_load(file_path = "path/to/raster.tif")
+
+# Load a Shapefile vector file
+vector_data <- geoRflow_load(file_path = "path/to/vector.shp")
+
+# Load a NetCDF file
+nc_data <- geoRflow_load(file_path = "path/to/data.nc")
+```
+### Use Case & Example:
+#### Geospatial Data Analysis for Environmental Monitoring:
+Imagine you are an environmental scientist with a collection of geospatial files containing land use, vegetation index, and climate data. You need to load these different types of geospatial data to analyze environmental changes over time in a specific region.
+
+Using `geoRflow_load`, you can:
+
+- **Load Various Data Types**: Easily load raster, vector, or NetCDF data with a single function call, without having to worry about the underlying file reading functions.
+- **Error Handling**: The function checks for file existence and supported file types, providing clear error messages to guide further actions.
+
+# Sample Usage
+```R
+land_use_data <- geoRflow_load(file_path = "path/to/land_use.shp")
+vegetation_index_data <- geoRflow_load(file_path = "path/to/vegetation_index.tif")
+climate_data <- geoRflow_load(file_path = "path/to/climate_data.nc")
+```
+
+## `geoRflow_export`
+
+### Description:
+The `geoRflow_export` function exports geospatial data to specified formats such as GeoJSON, Shapefile, or netCDF. The function first checks the existence of the output directory, creating it if necessary. If the input data is provided as a file path, it reads the data into appropriate spatial objects. Optionally, the function can split the data based on a specified identifier before exporting. The actual export is handled in a flexible manner, allowing for additional arguments to be passed to the underlying writing functions.
+
+### Parameters:
+- **`data`**: A spatial object or a character string specifying the path to the geospatial data file to be exported.
+- **`format`**: A character string specifying the export format. Options include "GeoJSON", "Shapefile", and "netCDF".
+- **`output_dir`**: A character string specifying the path to the output directory.
+- **`split_id`**: (Optional) A character string specifying the column name used to split the data before exporting.
+- **`...`**: Additional arguments to be passed to the underlying writing functions.
+
+### Returns:
+- The function exports the spatial data to the specified format, writing the files to the specified output directory. It does not return anything to the R environment.
+
+### Errors:
+- Throws an error if the file type or extension is unsupported, the specified `split_id` column does not exist, or the data type is incompatible with the specified export format.
+
+### Notes:
+- The function utilizes the `sf` and `stars` packages for handling spatial data and the `dplyr` package for data manipulation. Ensure that these packages are installed and loaded.
+- The `tools` package is used for extracting the file extension from the `data` argument when it is a character string.
+
+### Example of Simple Usage:
+
+**Basic Usage**:
+```R
+# Export a spatial object to GeoJSON
+geoRflow_export(data = spatial_obj, format = "GeoJSON", output_dir = "path/to/output")
+
+# Export a spatial object to Shapefile
+geoRflow_export(data = spatial_obj, format = "Shapefile", output_dir = "path/to/output")
+
+# Export a spatial object to netCDF
+geoRflow_export(data = spatial_obj, format = "netCDF", output_dir = "path/to/output")
+
+```
+
+### Use Case & Example:
+#### Geospatial Data Export for Data Sharing:
+Imagine you are a GIS analyst who needs to share geospatial data with collaborators in various formats. Your collaborators prefer different formats: some prefer GeoJSON, others prefer Shapefiles, and yet others prefer netCDF. Moreover, some datasets are quite large, and you want to split them based on a certain attribute (e.g., region) to make the data more manageable.
+
+Using `geoRflow_export`, you can:
+
+- **Flexible Export**: Easily export spatial data to various formats with a single function call.
+- **Data Splitting**: Optionally split the data based on a specified attribute before exporting, making large datasets more manageable for your collaborators.
+- **Directory Management**: Automatically check for the existence of the output directory and create it if necessary, streamlining the export process.
+
+# Sample Usage
+# Assuming spatial_obj is a spatial object with a 'Region' column
+
+```R
+# Export data, splitting it by region, to GeoJSON
+geoRflow_export(data = spatial_obj, format = "GeoJSON", output_dir = "path/to/output", split_id = "Region")
+
+# Similarly for Shapefile and netCDF
+geoRflow_export(data = spatial_obj, format = "Shapefile", output_dir = "path/to/output", split_id = "Region")
+geoRflow_export(data = spatial_obj, format = "netCDF", output_dir = "path/to/output", split_id = "Region")
+
+```
+
 ---
 
 ## `extract_raster_data_by_id`
