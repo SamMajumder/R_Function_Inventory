@@ -50,6 +50,8 @@ vegetation_index_data <- geoRflow_load(file_path = "path/to/vegetation_index.tif
 climate_data <- geoRflow_load(file_path = "path/to/climate_data.nc")
 ```
 
+---
+
 ## `geoRflow_export`
 
 ### Description:
