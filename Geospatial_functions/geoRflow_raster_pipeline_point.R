@@ -1,6 +1,8 @@
 
 
-
+#########
+### extract values from a raster at points ###
+########
 
 geoRflow_raster_pipeline_point <- function(inputs,
                                            df = NULL,
@@ -105,19 +107,18 @@ geoRflow_raster_pipeline_point <- function(inputs,
     return(extracted_values[[1]])  # This line should be outside of the tryCatch block
   }
   
-  
   # Process a single data frame (either the whole df or a subset)
-  process_df <- function(current_df, files) {
-    for (file in files) {
-      cat("Processing file:", file, "\n")
-      raster_data <- stars::read_stars(file)
+  process_df <- function(current_df, files, file_names) {
+    for (i in seq_along(files)) {
+      cat("Processing file:", file_names[i], "\n")
+      raster_data <- files[[i]]
       df_sf <- tryCatch({
         sf::st_as_sf(current_df, coords = c(lon_col, lat_col), crs = sf::st_crs(raster_data))
       }, error = function(e) {
         cat("Error in converting dataframe to sf object:\n", conditionMessage(e), "\n")
         return(NULL)
       })
-      column_name <- paste0(basename(file), "_processed")
+      column_name <- paste0(file_names[i], "_processed")
       current_df[[column_name]] <- extract_raster_values(raster_data, df_sf)
     }
     return(current_df)
@@ -142,18 +143,20 @@ geoRflow_raster_pipeline_point <- function(inputs,
   # Close the progress bar for raster processing
   close(pb)
   
+  # Separate vector to store file names
+  file_names <- basename(inputs)
+  
   dataframes_with_values <- list()
   
   if (is.null(split_id) || is.null(search_strings)) {
-    # Scenario 1: Process the whole data frame
     files <- processed_rasters
-    dataframes_with_values <- list(process_df(df, files))
+    dataframes_with_values <- list(process_df(df, files, file_names))
   } else {
-    # Scenario 2: Split the data frame and process each subset
     if (!split_id %in% colnames(df)) {
       stop(paste("Error: The column", split_id, "does not exist in the dataframe."))
     }
     df_list <- df %>% group_by(!!sym(split_id)) %>% dplyr::group_split()
+    
     dataframes_with_values <- purrr::map(df_list, function(current_df) {
       if (nrow(current_df) == 0 || is.null(current_df[[split_id]])) {
         return(NULL)
@@ -161,21 +164,20 @@ geoRflow_raster_pipeline_point <- function(inputs,
       current_id <- unique(current_df[[split_id]])
       cat("Processing for ID:", current_id, "\n")
       
-      # Get all files in the directory
-      all_files <- list.files(path = dirname(inputs[1]), full.names = TRUE)
+      # Filter the rasters based on the current ID
+      matching_indices <- grepl(current_id, file_names)
+      matching_files <- processed_rasters[matching_indices]
+      matching_file_names <- file_names[matching_indices]
       
-      # Loop through each search string and check for a match
-      for (search_string in search_strings) {
-        matching_files <- grep(search_string, all_files, value = TRUE)
-        if (length(matching_files) == 0) {
-          cat("No raster files found matching the search string:", search_string, "\n")
-          return(NULL)
-        }
-        return(process_df(current_df, matching_files))
+      if (length(matching_files) == 0) {
+        cat("No raster files found matching the ID:", current_id, "\n")
+        return(NULL)
       }
-      return(NULL)
+      
+      return(process_df(current_df, matching_files, matching_file_names))
     })
   }
   
   return(list(processed_rasters = processed_rasters, dataframes_with_values = dataframes_with_values))
 }
+
